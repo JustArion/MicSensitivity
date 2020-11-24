@@ -1,3 +1,5 @@
+using VRC.Core;
+
 namespace Dawn.Mic
 {
     using System;
@@ -53,17 +55,35 @@ namespace Dawn.Mic
                 return CurrentUserInstance;
             }
         }
-        
+        internal static ApiWorld GetWorld()
+        {
+            #if Unobfuscated
+             return RoomManager.currentRoom; //field_Internal_Static_ApiWorld_0
+            #else
+            return RoomManager.field_Internal_Static_ApiWorld_0;
+            #endif
+        }
+        internal static ApiWorldInstance GetWorldInstance()
+        {
+            #if Unobfuscated
+            return RoomManager.currentWorldInstance; //field_Internal_Static_ApiWorldInstance_0 
+            #else
+            return RoomManager.field_Internal_Static_ApiWorldInstance_0;
+            #endif
+        }
+        internal static bool IsInWorld()
+        {
+            return GetWorld() != null || GetWorldInstance() != null;
+        }
         private static IEnumerator USpeakerAdjust()
         {
             for (;;)
             {
-                
                 if (!UseMod) yield break;
                 #if Unobfuscated
-                if (CurrentUser()._uSpeaker != null) { CurrentUser()._uSpeaker.VolumeThresholdRMS = MicSensitivityValue; yield break; //field_Private_USpeaker_0 }
+                if (CurrentUser() != null && IsInWorld()) { yield return new WaitForSeconds(1); CurrentUser()._uSpeaker.VolumeThresholdRMS = MicSensitivityValue; yield break; //field_Private_USpeaker_0 }
                 #else
-                if (CurrentUser().field_Private_USpeaker_0 != null) { CurrentUser().field_Private_USpeaker_0.VolumeThresholdRMS = MicSensitivityValue; yield break; }
+                if (CurrentUser() != null && IsInWorld()) { yield return new WaitForSeconds(1); CurrentUser().field_Private_USpeaker_0.VolumeThresholdRMS = MicSensitivityValue; yield break; }
                 #endif
                 yield return new WaitForSeconds(1);
             }
