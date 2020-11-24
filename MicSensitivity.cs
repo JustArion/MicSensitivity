@@ -1,4 +1,4 @@
-﻿namespace Dawn.Mic
+namespace Dawn.Mic
 {
     using System;
     using System.Collections;
@@ -29,12 +29,7 @@
         public override void OnModSettingsApplied()
         {
             InternalConfigRefresh();
-            if (!UseMod) return;
-            #if Unobfuscated
-            CurrentUser()._uSpeaker.VolumeThresholdRMS = MicSensitivityValue; //field_Private_USpeaker_0
-            #else
-            CurrentUser().field_Private_USpeaker_0.VolumeThresholdRMS = MicSensitivityValue;
-            #endif
+            MelonCoroutines.Start(USpeakerAdjust());
         }
         #endregion
         #region The Actual Mod
@@ -63,16 +58,13 @@
         {
             for (;;)
             {
-                if (CurrentUser() != null)
-                {
-                    if (!UseMod) yield break;
-                    #if Unobfuscated
-                    CurrentUser()._uSpeaker.VolumeThresholdRMS = MicSensitivityValue; //field_Private_USpeaker_0
-                    #else
-                    CurrentUser().field_Private_USpeaker_0.VolumeThresholdRMS = MicSensitivityValue;
-                    #endif
-                    yield break;
-                }
+                
+                if (!UseMod) yield break;
+                #if Unobfuscated
+                if (CurrentUser()._uSpeaker != null) { CurrentUser()._uSpeaker.VolumeThresholdRMS = MicSensitivityValue; yield break; //field_Private_USpeaker_0 }
+                #else
+                if (CurrentUser().field_Private_USpeaker_0 != null) { CurrentUser().field_Private_USpeaker_0.VolumeThresholdRMS = MicSensitivityValue; yield break; }
+                #endif
                 yield return new WaitForSeconds(1);
             }
         }
