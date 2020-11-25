@@ -12,6 +12,7 @@ namespace Dawn.Mic
         #region MelonMod Native
         public override void OnApplicationStart()
         {
+            MelonPrefs.RegisterCategory("MicSensitivity", "Mic Sensitivity");
             MelonPrefs.RegisterBool("MicSensitivity", "Mic - Enable Mic Sensitivity Mod", false);
             MelonPrefs.RegisterFloat("MicSensitivity", "Mic - Microphone Sensitivity", 100);
             InternalConfigRefresh();
