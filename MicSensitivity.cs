@@ -82,9 +82,9 @@ namespace Dawn.Mic
             {
                 if (!UseMod) yield break;
                 #if Unobfuscated
-                if (CurrentUser() != null && IsInWorld()) { yield return new WaitForSeconds(1); CurrentUser()._uSpeaker.VolumeThresholdRMS = MicSensitivityValue; yield break; //field_Private_USpeaker_0 }
+                if (CurrentUser() != null && IsInWorld()) { yield return new WaitForSeconds(1); CurrentUser()._uSpeaker.VolumeThresholdRMS = MicSensitivityValue; CurrentUser().field_Private_USpeaker_0.VolumeThresholdPeak = (MicSensitivityValue * 2); yield break; //field_Private_USpeaker_0 }
                 #else
-                if (CurrentUser() != null && IsInWorld()) { yield return new WaitForSeconds(1); CurrentUser().field_Private_USpeaker_0.VolumeThresholdRMS = MicSensitivityValue; yield break; }
+                if (CurrentUser() != null && IsInWorld()) { yield return new WaitForSeconds(1); CurrentUser().field_Private_USpeaker_0.VolumeThresholdRMS = MicSensitivityValue; CurrentUser().field_Private_USpeaker_0.VolumeThresholdPeak = (MicSensitivityValue * 2); yield break; }
                 #endif
                 yield return new WaitForSeconds(1);
             }
