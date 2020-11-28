@@ -1,4 +1,4 @@
-﻿using MelonLoader;
+using MelonLoader;
 [assembly: MelonInfo(typeof(Dawn.Mic.MicSensitivity), Dawn.Update.AssemblyInfo.Name, Dawn.Update.AssemblyInfo.Version + Dawn.Update.AssemblyInfo.Version, Dawn.Update.AssemblyInfo.Authors)]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
@@ -8,7 +8,7 @@ namespace Dawn.Update
     {
         internal const string Name = "MicSensitivity";
 
-        internal const string Version = "1.0";
+        internal const string Version = "1.1";
 
         internal const string Description = "";
 
