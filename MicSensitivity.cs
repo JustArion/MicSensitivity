@@ -33,17 +33,21 @@ namespace Dawn.Mic
         {
             InternalConfigRefresh();
             MelonCoroutines.Start(USpeakerAdjust());
+            if (UseMod) return;
+            CurrentUser().field_Private_USpeaker_0.VolumeThresholdRMS = DefaultThreshold; CurrentUser().field_Private_USpeaker_0.VolumeThresholdPeak = (DefaultThreshold *2);
         }
         #endregion
         #region The Actual Mod
         private static float MicSensitivityValue;
         private static bool UseMod;
+        private const float DefaultThreshold = 0.01f;
+
         private static void InternalConfigRefresh() //The Divide by 10k sets it back to a managable float number
         {
             MicSensitivityValue = MelonPrefs.GetFloat("MicSensitivity", "Mic - Microphone Sensitivity") / 10000;
             UseMod = MelonPrefs.GetBool("MicSensitivity", "Mic - Enable Mic Sensitivity Mod");
         }
-        
+
         private static CurrentUserDelegate CurrentUserInstance;
         internal delegate VRCPlayer CurrentUserDelegate();
         internal static CurrentUserDelegate CurrentUser //Cached CurrentUser
