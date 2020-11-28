@@ -8,7 +8,7 @@ namespace Dawn.Update
     {
         internal const string Name = "MicSensitivity";
 
-        internal const string Version = "1.1";
+        internal const string Version = "1.2";
 
         internal const string Description = "";
 
