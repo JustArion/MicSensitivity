@@ -12,6 +12,6 @@ namespace Dawn.Update
 
         internal const string Description = "";
 
-        internal const string Authors = "@arion#1223";
+        internal const string Authors = "arion#1223";
     }
 }
