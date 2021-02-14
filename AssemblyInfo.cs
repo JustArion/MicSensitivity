@@ -1,14 +1,18 @@
-using MelonLoader;
-[assembly: MelonInfo(typeof(Dawn.Mic.MicSensitivity), Dawn.Update.AssemblyInfo.Name, Dawn.Update.AssemblyInfo.Version, Dawn.Update.AssemblyInfo.Authors)]
+﻿using MelonLoader;
+using static Dawn.Update.AssemblyInfo;
+using ModType = Dawn.Mic.MicSensitivity;
+
+[assembly: MelonInfo(typeof(ModType), Name, Version, Authors)]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
+
 namespace Dawn.Update
 {
     internal static class AssemblyInfo
     {
         internal const string Name = "MicSensitivity";
 
-        internal const string Version = "1.3";
+        internal const string Version = "1.4";
 
         internal const string Description = "";
 
