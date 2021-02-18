@@ -12,26 +12,11 @@ namespace Dawn
 {
     internal static class Core
     {
-        internal static ApiWorld currentRoom()
-        {
-        #if Unobfuscated
-             return RoomManager.currentRoom; //field_Internal_Static_ApiWorld_0
-        #else
-            return FindInstance(typeof(RoomManager), typeof(ApiWorld)).TryCast<ApiWorld>(); //Used to be RoomManager.field_Internal_Static_ApiWorld_0
-        #endif
-        }
-        internal static ApiWorldInstance currentWorldInstance()
-        {
-        #if Unobfuscated
-            return RoomManager.currentWorldInstance; //field_Internal_Static_ApiWorldInstance_0 
-        #else
-            return FindInstance(typeof(RoomManager), typeof(ApiWorldInstance)).TryCast<ApiWorldInstance>(); //Used to be RoomManager.field_Internal_Static_ApiWorldInstance_0
-        #endif
-        }
-        internal static bool IsInWorld()
-        {
-            return currentRoom() != null || currentWorldInstance() != null;
-        }
+        internal static ApiWorld currentRoom => FindInstance(typeof(RoomManager), typeof(ApiWorld)).TryCast<ApiWorld>();
+
+        internal static ApiWorldInstance currentWorldInstance => FindInstance(typeof(RoomManager), typeof(ApiWorldInstance)).TryCast<ApiWorldInstance>();
+        
+        internal static bool IsInWorld => currentRoom != null || currentWorldInstance != null;
         private static float infoIndex;
         internal static float userVolumeThreshold
         {
@@ -76,7 +61,7 @@ namespace Dawn
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                if (CurrentUser != null && IsInWorld()) 
+                if (CurrentUser != null && IsInWorld) 
                 { 
                     yield return new WaitForSeconds(1);
                     {
@@ -88,7 +73,7 @@ namespace Dawn
 
                 if (sw.Elapsed.Seconds >= 100) // This should never happen but a check for it is in place just in case.
                 {
-                    Log("WorldJoinedCoroutine took too long and was stopped.");
+                    MelonLogger.Warning("WorldJoinedCoroutine took too long and was stopped.");
                     yield break;
                 }
                 yield return new WaitForSeconds(1);
@@ -103,15 +88,15 @@ namespace Dawn
                 {
                     return (Il2CppSystem.Object)methodInfo.Invoke(null, null);
                 }
-                MelonLogger.LogError("[FindInstance] MethodInfo for " + WhatLooking.Name + " is null");
+                MelonLogger.Error("[FindInstance] MethodInfo for " + WhatLooking.Name + " is null");
             }
             catch (Exception e)
             {
-                MelonLogger.LogError($"[FindInstance] {e}");
+                MelonLogger.Error($"[FindInstance] {e}");
             }
             return null;
         }
-        internal static PropertyInfo GetInfo(string originalValue)
+        private static PropertyInfo GetInfo(string originalValue)
         {
             Log($"Caching USpeaker PropertyInfo {infoIndex+1} "); infoIndex =+ 1;
             var uPropInfos = typeof(USpeaker).GetProperties().Where(p => p.PropertyType == typeof(float));
@@ -124,8 +109,8 @@ namespace Dawn
         internal static USpeaker uInstance => CurrentUser.field_Private_USpeaker_0;
         internal static void InternalConfigRefresh() //The Divide by 10k sets it back to a managable float number
         {
-            MicSensitivityValue = MelonPrefs.GetFloat("MicSensitivity", "Mic - Microphone Sensitivity") / 10000;
-            UseMod = MelonPrefs.GetBool("MicSensitivity", "Mic - Enable Mic Sensitivity Mod");
+            SensitivityValue = MelonPreferences.GetEntryValue<float>("MicSensitivity", "Mic - Microphone Sensitivity") / 10000;
+            UseMod = MelonPreferences.GetEntryValue<bool>("MicSensitivity", "Mic - Enable Mic Sensitivity Mod");
         }
         /// <summary>
         /// Log an object to the MelonConsole
@@ -133,10 +118,10 @@ namespace Dawn
         /// <param name="obj"></param>
         internal static void Log(object obj)
         {
-            MelonLogger.Log(obj);
+            MelonLogger.Msg(obj);
         }
         /// <summary>
-        /// Current User Instance.
+        /// Current User Instance Cache.
         /// </summary>
         private static VRCPlayer CurrentUserInstance;
         /// <summary>

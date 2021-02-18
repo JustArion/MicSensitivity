@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using AssemblyInfo = Dawn.Update.AssemblyInfo;
+using static Dawn.Update.AssemblyInfo;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -19,8 +19,8 @@ using AssemblyInfo = Dawn.Update.AssemblyInfo;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("67FF3596-F54F-4788-BA8E-4C9B30AE829A")]
 
-[assembly: AssemblyTitle(AssemblyInfo.Name)]
-[assembly: AssemblyDescription(AssemblyInfo.Description)]
-[assembly: AssemblyProduct(AssemblyInfo.Name)]
-[assembly: AssemblyVersion(AssemblyInfo.Version)]
-[assembly: AssemblyFileVersion(AssemblyInfo.Version)]
+[assembly: AssemblyTitle(Name)]
+[assembly: AssemblyDescription(Description)]
+[assembly: AssemblyProduct(Name)]
+[assembly: AssemblyVersion(Version)]
+[assembly: AssemblyFileVersion(Version)]

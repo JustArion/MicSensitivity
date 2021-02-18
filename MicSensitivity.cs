@@ -1,4 +1,5 @@
-﻿using MelonLoader;
+﻿using Harmony;
+using MelonLoader;
 using static Dawn.Core;
 
 namespace Dawn.Mic
@@ -8,15 +9,15 @@ namespace Dawn.Mic
         #region MelonMod Native
         public override void OnApplicationStart()
         {
-            MelonPrefs.RegisterCategory("MicSensitivity", "Mic Sensitivity");
-            MelonPrefs.RegisterBool("MicSensitivity", "Mic - Enable Mic Sensitivity Mod", false);
-            MelonPrefs.RegisterFloat("MicSensitivity", "Mic - Microphone Sensitivity", 100);
+            MelonPreferences.CreateCategory("MicSensitivity", "Mic Sensitivity");
+            MelonPreferences.CreateEntry("MicSensitivity", "Mic - Enable Mic Sensitivity Mod", false);
+            MelonPreferences.CreateEntry("MicSensitivity", "Mic - Microphone Sensitivity", 100f);
             InternalConfigRefresh();
-            Log("On App Finished.");
         } //Settings Registration and Refresh
-        public override void OnLevelWasLoaded(int level) // World Join
+
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName) // World Join
         {
-            switch (level) //Prevents being called 3x
+            switch (buildIndex) //Prevents being called 3x
             {
                 case 0:
                 case 1:
@@ -26,7 +27,8 @@ namespace Dawn.Mic
                     break;
             }
         }
-        public override void OnModSettingsApplied()
+
+        public override void OnPreferencesSaved()
         {
             InternalConfigRefresh();
             SensitivitySetup();
@@ -34,21 +36,18 @@ namespace Dawn.Mic
             userVolumeThreshold = DefaultPeak; //Defaulted if Mod is not used.
             userVolumePeak = DefaultThreshold; //Defaulted if Mod is not used.
         }
+
         #endregion
         #region The Actual Mod
         internal static bool UseMod;
-        internal static float MicSensitivityValue = 0;
+        internal static float SensitivityValue = 0;
         private const float DefaultThreshold = 0.01f;
         private const float DefaultPeak = 0.02f;
 
         internal static void SensitivitySetup()
         {
             if (!UseMod) return;
-        #if Unobfuscated
-            CurrentUser._uSpeaker.VolumeThresholdRMS = MicSensitivityValue; CurrentUser.field_Private_USpeaker_0.VolumeThresholdPeak = (MicSensitivityValue * 2); //field_Private_USpeaker_0 }
-        #else
-            userVolumeThreshold = MicSensitivityValue; userVolumePeak = (MicSensitivityValue * 2); }
-        #endif
+            userVolumeThreshold = SensitivityValue; userVolumePeak = (SensitivityValue * 2); }
         #endregion
         }
         
