@@ -1,10 +1,9 @@
-﻿using Harmony;
-using MelonLoader;
+﻿using MelonLoader;
 using static Dawn.Core;
 
 namespace Dawn.Mic
 {
-    internal class MicSensitivity : MelonMod
+    internal sealed class MicSensitivity : MelonMod
     {
         #region MelonMod Native
         public override void OnApplicationStart()
@@ -14,6 +13,7 @@ namespace Dawn.Mic
             MelonPreferences.CreateEntry("MicSensitivity", "Mic - Microphone Sensitivity", 100f);
             InternalConfigRefresh();
         } //Settings Registration and Refresh
+
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName) // World Join
         {

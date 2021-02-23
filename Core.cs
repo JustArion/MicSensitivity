@@ -12,11 +12,11 @@ namespace Dawn
 {
     internal static class Core
     {
-        internal static ApiWorld currentRoom => FindInstance(typeof(RoomManager), typeof(ApiWorld)).TryCast<ApiWorld>();
+        private static ApiWorld currentRoom => FindInstance(typeof(RoomManager), typeof(ApiWorld)).TryCast<ApiWorld>();
 
-        internal static ApiWorldInstance currentWorldInstance => FindInstance(typeof(RoomManager), typeof(ApiWorldInstance)).TryCast<ApiWorldInstance>();
+        private static ApiWorldInstance currentWorldInstance => FindInstance(typeof(RoomManager), typeof(ApiWorldInstance)).TryCast<ApiWorldInstance>();
         
-        internal static bool IsInWorld => currentRoom != null || currentWorldInstance != null;
+        private static bool IsInWorld => currentRoom != null || currentWorldInstance != null;
         private static float infoIndex;
         internal static float userVolumeThreshold
         {
@@ -65,6 +65,7 @@ namespace Dawn
                 { 
                     yield return new WaitForSeconds(1);
                     {
+                        if (uInstance == null) yield return new WaitForSeconds(1); // 1 Extra check for the rare case scenario that uInstance is not set up fast enough from CurrentUser -> uInstance.
                         SensitivitySetup();
                     }
                     sw.Stop();
@@ -79,7 +80,7 @@ namespace Dawn
                 yield return new WaitForSeconds(1);
             }
         }
-        internal static Il2CppSystem.Object FindInstance(Type WhereLooking, Type WhatLooking) // Credits to Teo
+        private static Il2CppSystem.Object FindInstance(Type WhereLooking, Type WhatLooking) // Credits to Teo
         {
             try
             {
@@ -106,7 +107,7 @@ namespace Dawn
         
         private static PropertyInfo VolumePeakInfo;
         private static PropertyInfo VolumeThreasholdInfo;
-        internal static USpeaker uInstance => CurrentUser.field_Private_USpeaker_0;
+        private static USpeaker uInstance => CurrentUser.field_Private_USpeaker_0;
         internal static void InternalConfigRefresh() //The Divide by 10k sets it back to a managable float number
         {
             SensitivityValue = MelonPreferences.GetEntryValue<float>("MicSensitivity", "Mic - Microphone Sensitivity") / 10000;
@@ -127,7 +128,7 @@ namespace Dawn
         /// <summary>
         /// Returns the Current User aka the Player object.
         /// </summary>
-        internal static VRCPlayer CurrentUser
+        private static VRCPlayer CurrentUser
         {
             get
             {
