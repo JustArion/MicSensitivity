@@ -8,6 +8,7 @@ using UnityEngine;
 using VRC.Core;
 using static Dawn.Mic.MicSensitivity;
 
+
 namespace Dawn
 {
     internal static class Core
@@ -55,17 +56,17 @@ namespace Dawn
                 }
             }
         }
+        internal static bool isInstantiated => CurrentUser != null && IsInWorld && uInstance != null;
         internal static IEnumerator WorldJoinedCoroutine()
         {
             for (;;)
             {
                 var sw = new Stopwatch();
                 sw.Start();
-                if (CurrentUser != null && IsInWorld) 
+                if (isInstantiated) // 1 Extra check for the rare case scenario that uInstance is not set up fast enough from CurrentUser -> uInstance.
                 { 
                     yield return new WaitForSeconds(1);
                     {
-                        if (uInstance == null) yield return new WaitForSeconds(1); // 1 Extra check for the rare case scenario that uInstance is not set up fast enough from CurrentUser -> uInstance.
                         SensitivitySetup();
                     }
                     sw.Stop();

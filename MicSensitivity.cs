@@ -47,8 +47,9 @@ namespace Dawn.Mic
         internal static void SensitivitySetup()
         {
             if (!UseMod) return;
-            userVolumeThreshold = SensitivityValue; userVolumePeak = (SensitivityValue * 2); }
-        #endregion
+            if (!isInstantiated) return;
+            userVolumeThreshold = SensitivityValue; userVolumePeak = SensitivityValue * 2;
         }
-        
+        #endregion
+    }
 }
