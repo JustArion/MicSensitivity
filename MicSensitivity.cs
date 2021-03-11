@@ -31,25 +31,23 @@ namespace Dawn.Mic
         public override void OnPreferencesSaved()
         {
             InternalConfigRefresh();
-            SensitivitySetup();
-            if (UseMod) return;
-            userVolumeThreshold = DefaultPeak; //Defaulted if Mod is not used.
-            userVolumePeak = DefaultThreshold; //Defaulted if Mod is not used.
+            if (UseMod && isInstantiated)
+            {
+                userVolumeThreshold = SensitivityValue; userVolumePeak = SensitivityValue * 2;
+            }
+            else if (!UseMod && isInstantiated) // This is most likely due to the need to update to 1.4.3, People who don't use the Mod get a null ref if another mod calls the method.
+            {
+                userVolumeThreshold = DefaultPeak; //Defaulted if Mod is not used.
+                userVolumePeak = DefaultThreshold; //Defaulted if Mod is not used.
+            } 
         }
 
         #endregion
         #region The Actual Mod
-        internal static bool UseMod;
+        internal static bool UseMod = false;
         internal static float SensitivityValue = 0;
         private const float DefaultThreshold = 0.01f;
         private const float DefaultPeak = 0.02f;
-
-        internal static void SensitivitySetup()
-        {
-            if (!UseMod) return;
-            if (!isInstantiated) return;
-            userVolumeThreshold = SensitivityValue; userVolumePeak = SensitivityValue * 2;
-        }
         #endregion
     }
 }

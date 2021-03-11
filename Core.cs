@@ -56,7 +56,15 @@ namespace Dawn
                 }
             }
         }
-        internal static bool isInstantiated => CurrentUser != null && IsInWorld && uInstance != null;
+
+        internal static bool isInstantiated
+        {
+            get
+            {
+                if (CurrentUser == null || !IsInWorld) return false;
+                return uInstance != null; // Im guessing having it complete the check above ^ first, prevents uInstance from throwing a null ref at the CurrentUser level and checks if uspeaker is present.
+            }
+        }
         internal static IEnumerator WorldJoinedCoroutine()
         {
             for (;;)
@@ -67,7 +75,8 @@ namespace Dawn
                 { 
                     yield return new WaitForSeconds(1);
                     {
-                        SensitivitySetup();
+                        if (!UseMod) yield break;
+                        userVolumeThreshold = SensitivityValue; userVolumePeak = SensitivityValue * 2;
                     }
                     sw.Stop();
                     yield break; 
@@ -78,7 +87,7 @@ namespace Dawn
                     MelonLogger.Warning("WorldJoinedCoroutine took too long and was stopped.");
                     yield break;
                 }
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(1); // IEnumerator Speed Control
             }
         }
         private static Il2CppSystem.Object FindInstance(Type WhereLooking, Type WhatLooking) // Credits to Teo
