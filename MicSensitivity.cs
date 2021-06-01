@@ -23,6 +23,7 @@ namespace Dawn.Mic
                 case 1:
                     break;
                 default:
+                    if (!m_UseMod) return;
                     MelonCoroutines.Start(WorldJoinedCoroutine());
                     break;
             }
