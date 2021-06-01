@@ -66,17 +66,24 @@ namespace Dawn
                 return uInstance != null; // Im guessing having it complete the check above ^ first, prevents uInstance from throwing a null ref at the CurrentUser level and checks if uspeaker is present.
             }
         }
-        internal static IEnumerator WorldJoinedCoroutine()
+
+        private static bool Running;
+        private static DateTime CoroutineInitiationTime;
+        internal static IEnumerator WorldJoinedCoroutine() // This is likely more complicated than it should be.
         {
+            if (CoroutineInitiationTime > CoroutineInitiationTime.AddSeconds(25)) Running = false;  // Timeout for Running to reset.
+            CoroutineInitiationTime = DateTime.Now;
+            if (Running) yield break; // Prevents Coroutine Running multiple times if WorldJoin is diverted.
+            Running = true;
+            var sw = new Stopwatch();
+            sw.Start();
             for (;;)
             {
-                var sw = new Stopwatch();
-                sw.Start();
                 if (isInstantiated) // 1 Extra check for the rare case scenario that uInstance is not set up fast enough from CurrentUser -> uInstance.
-                { 
+                {
+                    Running = false;
                     yield return new WaitForSeconds(1);
                     {
-                        if (!m_UseMod) yield break;
                         userVolumeThreshold = m_SensitivityValue; userVolumePeak = m_SensitivityValue * 2;
                     }
                     sw.Stop();
@@ -85,6 +92,7 @@ namespace Dawn
 
                 if (sw.Elapsed.Seconds >= 100) // This should never happen but a check for it is in place just in case.
                 {
+                    Running = false;
                     MelonLogger.Warning("WorldJoinedCoroutine took too long and was stopped.");
                     yield break;
                 }
@@ -133,16 +141,13 @@ namespace Dawn
                     USpeakerInfo = Check1 != null ? Check1 : Counter.FirstOrDefault();
                     break;
             }
-            if (USpeakerInfo is not null)
-            {
-                MelonLogger.Msg("Cached USpeaker PropertyInfo");
-                return USpeakerInfo.GetValue(_Player) as USpeaker;
-            }
+            if (USpeakerInfo is not null) return USpeakerInfo.GetValue(_Player) as USpeaker;
             MelonLogger.Error("Failed To Cache USpeaker PropertyInfo");
             return null;
         }
         private static USpeaker uInstance => CurrentUser._USpeaker();
-        internal static void InternalConfigRefresh() //The Divide by 10k sets it back to a managable float number
+        //TODO - Convert to Discord Sensitivity Numbers ( -50 -100 )
+        internal static void InternalConfigRefresh() //The Divide by 10k sets it back to a manageable float number
         {
             m_SensitivityValue = MelonPreferences.GetEntryValue<float>("MicSensitivity", "Mic - Microphone Sensitivity") / 10000;
             m_UseMod = MelonPreferences.GetEntryValue<bool>("MicSensitivity", "Mic - Enable Mic Sensitivity Mod");
