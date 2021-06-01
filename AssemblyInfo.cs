@@ -1,9 +1,12 @@
-﻿using MelonLoader;
+﻿using System;
+using Dawn.Update;
+using MelonLoader;
 using static Dawn.Update.AssemblyInfo;
 using ModType = Dawn.Mic.MicSensitivity;
 
-[assembly: MelonInfo(typeof(ModType), Name, Version, Authors)]
+[assembly: MelonInfo(typeof(ModType), Name, AssemblyInfo.Version, Authors)]
 [assembly: MelonGame("VRChat", "VRChat")]
+[assembly: MelonColor(ConsoleColor.DarkCyan)]
 [assembly: MelonOptionalDependencies("UIExpansionKit")]
 
 namespace Dawn.Update
