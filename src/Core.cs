@@ -10,9 +10,11 @@ using VRC;
 using VRC.Core;
 using VRC.SDK3.Components;
 using static Dawn.Mic.MicSensitivity;
-namespace Dawn
+namespace Dawn.Mic
 {
-    internal static class Core
+    using MonoMod.Utils;
+
+    internal static partial class Core
     {
         private static ApiWorld currentRoom => FindInstance(typeof(RoomManager), typeof(ApiWorld)).TryCast<ApiWorld>();
 
@@ -22,39 +24,24 @@ namespace Dawn
         private static float infoIndex;
         internal static float userVolumeThreshold
         {
-            get
-            {
-                if (VolumeThreasholdInfo != null) return float.Parse(VolumeThreasholdInfo.GetValue(uInstance).ToString());
-                VolumeThreasholdInfo = GetInfo("0.01"); // This should only ever be called on WorldJoin and never again.
-                return float.Parse(VolumeThreasholdInfo.GetValue(uInstance).ToString());
-            }
+            get => GetVolumeThreshold?.Invoke(uInstance) ?? (GetVolumeThreshold = GetInfo("0.01")!.GetMethod.CreateDelegate<Func<USpeaker, float>>())(uInstance);
             set
             {
-                if (VolumeThreasholdInfo != null) VolumeThreasholdInfo.SetValue(uInstance, value);
+                if (SetVolumeThreshold != null)
+                    SetVolumeThreshold(uInstance, value);
                 else
-                {
-                    VolumeThreasholdInfo = GetInfo("0.01"); // This should only ever be called on WorldJoin and never again.
-                    VolumeThreasholdInfo.SetValue(uInstance, value);
-                }
+                    (SetVolumeThreshold = GetInfo("0.01")!.SetMethod.CreateDelegate<Action<USpeaker, float>>())(uInstance, value);
             }
         }
         internal static float userVolumePeak
         {
-            get 
-            {
-                if (VolumePeakInfo != null) return float.Parse(VolumePeakInfo.GetValue(uInstance).ToString());
-
-                VolumePeakInfo = GetInfo("0.02"); // This should only ever be called on WorldJoin and never again.
-                return float.Parse(VolumePeakInfo.GetValue(uInstance).ToString());
-            }
+            get => GetVolumePeak?.Invoke(uInstance) ?? (GetVolumePeak = GetInfo("0.02")!.GetMethod.CreateDelegate<Func<USpeaker, float>>())(uInstance);
             set
             {
-                if (VolumePeakInfo != null) VolumePeakInfo.SetValue(uInstance, value);
+                if (SetVolumePeak != null)
+                    SetVolumePeak(uInstance, value);
                 else
-                {
-                    VolumePeakInfo = GetInfo("0.02"); // This should only ever be called on WorldJoin and never again.
-                    VolumePeakInfo.SetValue(uInstance, value);
-                }
+                    (SetVolumePeak = GetInfo("0.02")!.SetMethod.CreateDelegate<Action<USpeaker, float>>())(uInstance, value);
             }
         }
 
@@ -99,52 +86,7 @@ namespace Dawn
                 yield return new WaitForSeconds(1); // IEnumerator Speed Control
             }
         }
-        private static Il2CppSystem.Object FindInstance(IReflect WhereLooking, Type WhatLooking) // Credits to Teo
-        {
-            try
-            {
-                var methodInfo = WhereLooking.GetMethods(BindingFlags.Public | BindingFlags.Static).FirstOrDefault(m => m.ReturnType == WhatLooking && m.GetParameters().Length == 0);
-                if (methodInfo != null)
-                {
-                    return (Il2CppSystem.Object)methodInfo.Invoke(null, null);
-                }
-                MelonLogger.Error("[FindInstance] MethodInfo for " + WhatLooking.Name + " is null");
-            }
-            catch (Exception e)
-            {
-                MelonLogger.Error($"[FindInstance] {e}");
-            }
-            return null;
-        }
-        private static PropertyInfo GetInfo(string originalValue)
-        {
-            Log($"Caching USpeaker PropertyInfo {infoIndex+1} "); infoIndex =+ 1;
-            var uPropInfos = typeof(USpeaker).GetProperties().Where(p => p.PropertyType == typeof(float));
-
-            return uPropInfos.FirstOrDefault(uInfo => uInfo.GetValue(uInstance).ToString() == originalValue);
-        }
-        
-        private static PropertyInfo VolumePeakInfo;
-        private static PropertyInfo VolumeThreasholdInfo;
-        private static PropertyInfo USpeakerInfo;
-
-        private static USpeaker _USpeaker(this VRCPlayer _Player)
-        {
-            if (USpeakerInfo != null) return USpeakerInfo.GetValue(_Player) as USpeaker;
-            var Counter = typeof(VRCPlayer).GetProperties().Where(propInfo => propInfo.PropertyType == typeof(USpeaker)).ToList();
-            switch (Counter.Count)
-            {
-                case 1: USpeakerInfo = Counter.FirstOrDefault();
-                    break;
-                case > 1:
-                    var Check1 = Counter.FirstOrDefault(pinfo => pinfo.Name.StartsWith("prop_"));
-                    USpeakerInfo = Check1 != null ? Check1 : Counter.FirstOrDefault();
-                    break;
-            }
-            if (USpeakerInfo is not null) return USpeakerInfo.GetValue(_Player) as USpeaker;
-            MelonLogger.Error("Failed To Cache USpeaker PropertyInfo");
-            return null;
-        }
+        private static USpeaker _USpeaker(this VRCPlayer _Player) => USpeakerInstance(_Player);
         private static USpeaker uInstance => CurrentUser._USpeaker();
         //TODO - Convert to Discord Sensitivity Numbers ( -50 -100 )
         internal static void InternalConfigRefresh() //The Divide by 10k sets it back to a manageable float number
@@ -156,10 +98,7 @@ namespace Dawn
         /// Log an object to the MelonConsole
         /// </summary>
         /// <param name="obj"></param>
-        internal static void Log(object obj)
-        {
-            MelonLogger.Msg(obj);
-        }
+        private static void Log(object obj) => MelonLogger.Msg(obj);
         /// <summary>
         /// Current User Instance Cache.
         /// </summary>

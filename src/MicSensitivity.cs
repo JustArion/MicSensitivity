@@ -1,5 +1,5 @@
 ﻿using MelonLoader;
-using static Dawn.Core;
+using static Dawn.Mic.Core;
 
 namespace Dawn.Mic
 {
